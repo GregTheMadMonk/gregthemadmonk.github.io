@@ -1,8 +1,11 @@
 ---
-title: "Fold expressions for metaprogramming or \"The wrong reason to rightfully want extension methods in C++\""
+title: "Fold Expressions for Metaprogramming or \"The Wrong Reason to Rightfully Want Extension Methods in C++\""
 date: 2023-04-22T01:27:54+03:00
 draft: true
 ---
+
+__Disclaimer:__ when writing code examples for that article, I wasn't really concerned with passing/returning references where it might make actual sense in real scenarios.
+The code here is for demonstration, only to provide you with an idea of the tricks that could be used to write actual optimized code.
 
 ## Toy problem
 
@@ -15,7 +18,7 @@ In short, for
 ```c++
 template <std::totally_ordered... Types>
 SomeStdTupleInstance f(Types...) {
-    /* The implementation we don't care about */
+    /* The implementation we don't care about for now */
 }
 ```
 we want to create an `std::tuple` that will contain every type from `Types` once and only once.
@@ -33,9 +36,11 @@ template <typename Type1, typename... Types, typename... TupleArgs>
 struct TupleSet<std::tuple<TupleArgs...>, Type1, Types...> {
     using Type = TupleSet<
         std::conditional_t<
-            (std::same_as<TupleArgs, Type1> || ... || false), // If `Type1` is already in the tuple
-            std::tuple<TupleArgs...>,                         // Don't add it
-            std::tuple<TupleArgs..., Type1>                   // Else append to the end of the tuple arguments
+            (std::same_as<TupleArgs, Type1> || ... || false),
+            // If `Type1` is already in the tuple, don't add it
+            std::tuple<TupleArgs...>,
+            // Else append it to the end of the tuple
+            std::tuple<TupleArgs..., Type1>
         >, Types...
     >::Type;
 };
@@ -56,7 +61,6 @@ Indeed,
 ```c++
 static_assert(std::same_as<TupleSetT<int, float>, std::tuple<int, float>>);
 static_assert(std::same_as<TupleSetT<int, float, int>, std::tuple<int, float>>);
-static_assert(std::same_as<TupleSetT<int, float>, std::tuple<int, float>>);
 ```
 compiles and we can now declare our function as
 ```c++
@@ -87,7 +91,7 @@ Readability has decreased, however, I wouldn't call it a dramatic decline since 
 Most importantly, it completely replaces the recursive template that needed to be specialized to terminate the sequence: fold expression automatically has the length corresponding to the used parameter pack and needs no such tricks.
 This is a handy little trick to organize recursive process on templates without explicit recursion.
 
-For more examples of this trick, go to [Appendix 1](#appendix-1-more-toy-examples).
+For more examples of this trick, go to [Appendix](#appendix-more-toy-examples).
 
 ## Air pollution
 
@@ -172,7 +176,7 @@ Enter extension methods.
 Well, not quite yet: they're not in C++, but we can get a pretty good idea of that they might look like from [deducing this](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p0847r6.html).
 For our li'l old `std::tuple` we would probably write an extension method as somethings like this:
 ```c++
-template <std::totally_ordered... Types>
+template <std::totally_ordered Type, std::totally_ordered... Types>
 constexpr auto pushElementOfUniqueType(this std::tuple<Types...> tup, Type t) {
     if constexpr ((std::same_as<Types, Type> || ... || false)) {
         auto& tupVal = std::get<Type>(tup);
@@ -192,20 +196,23 @@ To be able to do what we want we would need the ability to chain method/extensio
 ```c++
 template <std::totally_ordered... Types>
 constexpr auto f(Types... args) {
-    return std::tuple<>{}. ...pushElementOfUniqueType(args); // or, maybe, even ...detail::pushElementOfUniqueType(args)?!
+    return std::tuple<>{}. ...pushElementOfUniqueType(args);
+    // or, maybe, even ...detail::pushElementOfUniqueType(args)?!
 }
 ```
 
 We would be able to provide the interface that we are almost 100% sure does not interfere with any existing code (precisely 100% if we would be able to add a namespace specifiaction to the call).
 
-## Wild time
+## No, we have UFCS at home!
 
 What can we do now?
 Well, while there is nothing even resmbling UFCS in C++ yet, we can go to... operator overloading again.
 [We'll do it like here](https://cpptruths.blogspot.com/2017/01/folding-monadic-functions.html), but uglier, picking an operator that's highly unlikely to be used in another context with our arguments.
 We get something like this:
+
 ```c++
 template <typename T, typename Func>
+requires std::invocable<Func, T>
 constexpr auto operator>>=(T t, Func func) {
     return func(t);
 }
@@ -228,7 +235,110 @@ constexpr auto f(auto... args) {
 static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
 ```
 
-## Appendix 1: More toy examples
+We can also try simplify `f()` even further by creating a UFCS-like interface and defining an `operator>>=` only for it:
+
+```c++
+template <typename Callable, typename... Args>
+class CallPromise {
+    std::tuple<Args...> args;
+    Callable callable;
+public:
+    constexpr CallPromise(Callable callable_, Args... args_) : callable(callable_), args(args_...) {}
+
+    template <typename T> requires std::invocable<Callable, T, Args...>
+    constexpr auto operator()(T t) {
+        return std::apply([this, t] (Args... targs) { return this->callable(t, targs...); }, args);
+    }
+};
+
+template <typename T, typename Callable, typename... Args>
+requires std::invocable<CallPromise<Callable, Args...>, T>
+constexpr auto operator>>=(T t, CallPromise<Callable, Args...> promise) {
+    return promise(t);
+}
+
+constexpr auto pushElementOfUniqueType =
+    []
+    <std::totally_ordered Type, std::totally_ordered... Types>
+    (std::tuple<Types...> tup, Type t) {
+        if constexpr ((std::same_as<Types, Type> || ... || false)) {
+            auto& tupVal = std::get<Type>(tup);
+            if (tupVal < t) tupVal = t;
+            return tup;
+        } else {
+            return std::make_tuple(std::get<Types>(tup)..., t);
+        }
+    };
+
+constexpr auto f(auto... args) {
+    return (std::tuple<>{} >>= ... >>= CallPromise(pushElementOfUniqueType, args));
+}
+
+static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
+```
+
+This is a lot of code but arguably the least invasive solution: there are no operator overloads for types other than the ones providing the interface itself.
+There also are drawbacks: this will only work with lambdas as function templates cannot be passed directly as an argument to `CallPromise` constructor, in addition to a relatively large boilerplate for such a conceptually simple task.
+Not that I'm afraid of boilerplate -- still, it would be nice if we had a built-in language feature for this that would've worked with all functions, function objects and function templates.
+And, aside from the extension methods and whatever we just wrote here, there might be another way.
+Not now, of course, the best C++ features are not in the language yet.
+But still, take a look at [pipeline-rewrite operator](https://open-std.org/JTC1/SC22/WG21/docs/papers/2020/p2011r0.html) (or, rather, how I imagine it would work if `|>` operator gets fold expressions):
+
+```c++
+template <std::totally_ordered Type, std::totally_ordered... Types>
+constexpr auto pushElementOfUniqueType(std::tuple<Types...> tup, Type t) {
+    if constexpr ((std::same_as<Types, Type> || ... || false)) {
+        auto& tupVal = std::get<Type>(tup);
+        if (tupVal < t) tupVal = t;
+        return tup;
+    } else {
+        return std::make_tuple(std::get<Types>(tup)..., t);
+    }
+};
+
+constexpr auto f(auto... args) {
+    return (std::tuple<>{} |> ... |> pushElementOfUniqueType(args));
+}
+```
+
+I would still argue that this is less elegant than folding extension methods (also, `|>` would not be callable on the regular class methods), it is, to my liking, one of the nicer solutions to the problem.
+
+## One small miracle
+
+As you might've guessed, I really want to see extension methods in C++.
+I would also agree for pipeline-rewrite operator.
+I might even go crazy and accepts UFCS for all free functions just out of despair.
+
+Aside from the crasy possibilities extension methods/pipeline-rewrite would offer (in the case they get a proper fold expression support), there are also much more grounded uses for them including (but not limited to!) wrapping C APIs, preparing your codebase to simplify future standard library updates (like adding a custom `.contains()` to the string until C++23 becomes usable) and reducing the amount of parenthesis required to write map-reduce (kind of already solved by ranges using... operator overloads).
+
+There are possible problems with this, but, the way I see it, there is no unwritten rule extension methods violate that operator overloads do not already.
+Most of them are related to the problematic method/operator being in scopre or not, and are solvable by allowing programmers to explicitly specify from which namesapace the extension/operator should be taken.
+
+If introduced, extension methods, as most of C++, could be a powerful, but also dangerous in inexperienced hands tool that would allow programmers with proper understanding of the mechanism write cleaner, more readable code.
+
+-------
+
+_Dear C++ Santa Comittee!_
+
+_Writes to you a little C++ programmer._
+_Even though I come from a place where Christmas is not as widely celebrated and kids write to Granpa Frost instead of Santa, I couldn't think of a pun that would use this._
+_Still, New Year and Christmas are pretty close, so why don't I give writing __you__ a shot?_
+
+_The two things that I wish the most for the next C++ standard are fold expressions for object/pointer method calls and extension methods._
+_There are a lot of cool features to tackle and want, but I am humble: give me this, and I'll probably be happy for several revisions._
+
+_I wasn't naughty: I respected my supervisor and I've been writing C++._
+_I haven't done bad things, oh no-no, I didn't._
+_Except for that one time I made changes to a Rust project, but that doesn't count, right?_
+
+_I am 23 year old, but I want to believe in a little CXX-mas miracle._
+_Pretty please, Santa? You wouldn't leave a junior dev without a present would you?_
+
+_Sincerely yours, GregTheMadMonk._
+
+-------
+
+## Appendix: More toy examples
 
 These examples, especially [Find `std::tuple`'s Nth argument](#find-tuples-nth-argument-without-stdget), are not very useful for `std::tuple`.
 They could be, however, implemented for any other template, where they may turn out to be very handy.

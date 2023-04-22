@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>GregTheMadMonk&#39;s GitHub Pages</title>
+    <link>https://gregthemadmonk.github.io/</link>
+    <description>Recent content on GregTheMadMonk&#39;s GitHub Pages</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="https://gregthemadmonk.github.io/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

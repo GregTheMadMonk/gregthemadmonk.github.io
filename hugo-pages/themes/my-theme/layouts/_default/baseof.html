@@ -2,6 +2,14 @@
 <html>
     {{- partial "head.html" .  -}}
     <body>
+        <nav>
+            <a href="/">{{ .Site.Title }}</a>
+        </nav>
+        <header>
+            <h1>{{ .Title }}</h1>
+        </header>
+        <main>
         {{- block "main" . }}{{- end }}
+        </main>
     </body>
 </html>

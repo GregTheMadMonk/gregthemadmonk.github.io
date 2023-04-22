@@ -1,0 +1,39 @@
+html, body {
+    min-width: 100vw;
+    padding: 0;
+    margin: 0;
+}
+body > main, body > header, body > footer, body > nav {
+    width: 100vw;
+    margin: 0;
+}
+
+div.highlight > pre {
+    text-size-adjust: 270%;
+    padding: 3em 5ch;
+}
+
+div.highlight {
+    margin: 2em 0;
+}
+
+h1 {
+    text-size-adjust: 400%;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
+h2 {
+    text-size-adjust: 350%;
+    padding-top: 1em;
+    padding-bottom: .5em;
+}
+
+h3 {
+    text-size-adjust: 275%;
+    padding-top: 1em;
+}
+
+body > main > nav > ul {
+    padding: 2em 6ch;
+}
