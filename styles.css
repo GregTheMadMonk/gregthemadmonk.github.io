@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Rubik+Pixels&display=swap');
+
+html {
+    font-family: 'Quicksand';
+}
+
+html, body {
+    padding: 0;
+    margin: 0;
+    width: 100vw;
+
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+
+    color: white;
+    background: #111;
+}
+
+body > main, body > header, body > footer, body > nav {
+    width: 100ch;
+    padding: 0 2ch;
+    margin: 0 auto;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+body > nav, body > main {
+    background: #ccc;
+    color: black;
+}
+
+body > nav {
+    text-align: center;
+    padding: 1em;
+    box-shadow: rgba(0, 0, 0, .9) 0 3px 7px 7px;
+}
+
+body > nav > a {
+    font-size: 1.5em;
+}
+
+body > main {
+    box-shadow: rgba(0, 0, 0, .9) 0 -3px 7px 7px;
+}
+
+body > main > nav > ul {
+    padding-left: 3ch;
+}
+
+body > main > p.ps {
+    padding: 1em 0 2em 0;
+    text-align: center;
+}
+
+nav#TableOfContents {
+    padding: 1em 0;
+    padding-bottom: .25em;
+}
+
+a {
+    color: black;
+}
+
+h1 {
+    text-align: center;
+}
+
+hr {
+    border-style: dotted;
+    border-bottom: none;
+    border-color: #888;
+    width: 90%;
+}
+
+div.highlight > pre {
+    padding: 1em;
+    border-radius: 1em;
+    overflow-x: auto;
+}
+
+/*
+p > code {
+    background-color: #272822;
+    color: #f8f8f2;
+    padding: .25ch .25em;
+    border-radius: .25em;
+}
+*/

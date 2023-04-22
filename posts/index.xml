@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>GregTheMadMonk&#39;s GitHub Pages</title>
-    <link>https://gregthemadmonk.github.io/</link>
-    <description>Recent content on GregTheMadMonk&#39;s GitHub Pages</description>
+    <title>Posts on GregTheMadMonk&#39;s GitHub Pages</title>
+    <link>https://gregthemadmonk.github.io/posts/</link>
+    <description>Recent content in Posts on GregTheMadMonk&#39;s GitHub Pages</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 22 Apr 2023 01:27:54 +0300</lastBuildDate><atom:link href="https://gregthemadmonk.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 22 Apr 2023 01:27:54 +0300</lastBuildDate><atom:link href="https://gregthemadmonk.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Fold Expressions for Metaprogramming or &#34;The Wrong Reason to Rightfully Want Extension Methods in C&#43;&#43;&#34;</title>
       <link>https://gregthemadmonk.github.io/posts/operator-folding-tricks/</link>

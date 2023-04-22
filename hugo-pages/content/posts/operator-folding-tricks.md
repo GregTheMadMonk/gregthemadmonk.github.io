@@ -1,7 +1,7 @@
 ---
 title: "Fold Expressions for Metaprogramming or \"The Wrong Reason to Rightfully Want Extension Methods in C++\""
 date: 2023-04-22T01:27:54+03:00
-draft: true
+draft: false
 ---
 
 __Disclaimer:__ when writing code examples for that article, I wasn't really concerned with passing/returning references where it might make actual sense in real scenarios.
