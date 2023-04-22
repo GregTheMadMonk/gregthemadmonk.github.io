@@ -66,7 +66,7 @@ TupleSetT<Types...> f(Types...);
 
 But we can also do better.
 
-## Toy solution number two
+## One man's trash
 
 In the previous solution, we had to write `struct TupleSet` three times!
 This is unacceptable and unreadable.
@@ -133,7 +133,7 @@ We will still have to declare a named helper for this, even if we don't want to.
 And what if there is a winning specification for one of the templates already somewhere ([like this example](https://godbolt.org/z/qK5f6xYqK))?
 What do we do?
 
-## I just want extensions. Please!
+## Another man's treasure
 
 Let's take a step back and see how we could actually implement our `f()`.
 It's relatively easy if we give a meaning to our already existing `operator+`:
@@ -197,6 +197,36 @@ constexpr auto f(Types... args) {
 ```
 
 We would be able to provide the interface that we are almost 100% sure does not interfere with any existing code (precisely 100% if we would be able to add a namespace specifiaction to the call).
+
+## Wild time
+
+What can we do now?
+Well, while there is nothing even resmbling UFCS in C++ yet, we can go to... operator overloading again.
+[We'll do it like here](https://cpptruths.blogspot.com/2017/01/folding-monadic-functions.html), but uglier, picking an operator that's highly unlikely to be used in another context with our arguments.
+We get something like this:
+```c++
+template <typename T, typename Func>
+constexpr auto operator>>=(T t, Func func) {
+    return func(t);
+}
+
+constexpr auto f(auto... args) {
+    constexpr auto op = [] <typename Type> (Type arg) {
+        return [arg] <typename... Types> (std::tuple<Types...> tup) {
+            if constexpr ((std::same_as<Types, Type> || ... || false)) {
+                auto& tupVal = std::get<Type>(tup);
+                if (tupVal < arg) tupVal = arg;
+                return tup;
+            } else {
+                return std::make_tuple(std::get<Types>(tup)..., arg);
+            }
+        };
+    };
+    return (std::tuple<>{} >>= ... >>= op(args));
+}
+
+static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
+```
 
 ## Appendix 1: More toy examples
 
