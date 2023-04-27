@@ -1,0 +1,372 @@
+<!DOCTYPE HTML>
+<html><head>
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" media="screen and (max-width: 1000px)" href="/styles-mobile.css" />
+    
+    
+    <title>
+        Fold Expressions for Metaprogramming or &#34;The Wrong Reason to Rightfully Want Extension Methods in C&#43;&#43;&#34; &amp;mdash; GregTheMadMonk&#39;s GitHub Pages
+    </title>
+</head>
+<body>
+        <nav>
+            <a href="/">GregTheMadMonk&#39;s GitHub Pages</a>
+        </nav>
+        <header>
+            <h1>Fold Expressions for Metaprogramming or &#34;The Wrong Reason to Rightfully Want Extension Methods in C&#43;&#43;&#34;</h1>
+        </header>
+        <main>
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#toy-problem">Toy problem</a></li>
+    <li><a href="#toy-solution">Toy solution</a></li>
+    <li><a href="#one-mans-trash">One man&rsquo;s trash</a></li>
+    <li><a href="#air-pollution">Air pollution</a></li>
+    <li><a href="#another-mans-treasure">Another man&rsquo;s treasure</a></li>
+    <li><a href="#no-we-have-ufcs-at-home">No, we have UFCS at home!</a></li>
+    <li><a href="#weve-been-compromised">We&rsquo;ve been compromised</a></li>
+    <li><a href="#one-small-miracle">One small miracle</a></li>
+    <li><a href="#appendix-more-toy-examples">Appendix: More toy examples</a>
+      <ul>
+        <li><a href="#reverse-tuple-arguments">Reverse tuple arguments</a></li>
+        <li><a href="#find-tuples-nth-argument-without-stdget">Find tuple&rsquo;s Nth argument without <code>std::get</code></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<p><em><strong>Disclaimer:</strong> when writing code examples for that article, I wasn&rsquo;t really concerned with passing/returning references where it might make actual sense in real scenarios.
+All examples here are for demonstration, only to provide you with an idea of the tricks that could be used to write actual code.
+I have personally encountered cases where snippets written naively (by me), like the ones in this article, would break, as a result of being used on non-copyable types.
+Still, I consider the basic concepts and ideas described here worth sharing.</em></p>
+<h2 id="toy-problem">Toy problem</h2>
+<p>Consider the following problem: you are asked to write a function that will accept an arbitrary number of arguments of arbitrary types satisfying the <code>std::totally_ordered</code> concept.
+The function must return an <code>std::tuple</code> with max argument passed for each type.</p>
+<p>Don&rsquo;t try to write a complete implementation for it yet (we will write it later).
+I want you to start with performing another exercie: computing a return type for such function: for a black-box function</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>SomeStdTupleInstance f(Types...) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/* The implementation we don&#39;t care about for now */</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>we need to write <code>SomeStdTupleInstance</code>.
+How do we do that?</p>
+<h2 id="toy-solution">Toy solution</h2>
+<p>The first thing that comes to mind (for me it used to be that, at least) is to make some kind of recursive template.
+We will go over all of the types passed to us and conditionally append them to the accumulator:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Declare the template
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Tuple, <span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">TupleSet</span> {};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Specialize for our case: carry our &#39;return value&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// in the first template argument, and all the info
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// to process in the rest
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Type1, <span style="color:#66d9ef">typename</span>... Types, <span style="color:#66d9ef">typename</span>... TupleArgs<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">TupleSet</span><span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>TupleArgs...<span style="color:#f92672">&gt;</span>, Type1, Types...<span style="color:#f92672">&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> Type <span style="color:#f92672">=</span> TupleSet<span style="color:#f92672">&lt;</span>
+</span></span><span style="display:flex;"><span>        std<span style="color:#f92672">::</span>conditional_t<span style="color:#f92672">&lt;</span>
+</span></span><span style="display:flex;"><span>            (std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleArgs, Type1<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false),
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// If `Type1` is already in the tuple, don&#39;t add it
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>TupleArgs...<span style="color:#f92672">&gt;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// Else append it to the end of the tuple
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>TupleArgs..., Type1<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&gt;</span>, Types...
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&gt;::</span>Type;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Terminating specialization: nothing left to process
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... TupleArgs<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">TupleSet</span><span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>TupleArgs...<span style="color:#f92672">&gt;&gt;</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> Type <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>TupleArgs...<span style="color:#f92672">&gt;</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><p>Now, by adding</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>usign TupleSetT <span style="color:#f92672">=</span> <span style="color:#66d9ef">typename</span> TupleSet<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>, Types...<span style="color:#f92672">&gt;</span>;
+</span></span></code></pre></div><p>we have a nice working piece of code.
+Indeed,</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleSetT<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span><span style="color:#f92672">&gt;</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span><span style="color:#f92672">&gt;&gt;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleSetT<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span>, <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span><span style="color:#f92672">&gt;&gt;</span>);
+</span></span></code></pre></div><p>compiles and we can now declare our function as</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>TupleSetT<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> f(Types...);
+</span></span></code></pre></div><p>Not bad at all (it is pretty bad, IMO).
+But we can also do better.</p>
+<h2 id="one-mans-trash">One man&rsquo;s trash</h2>
+<p>In the previous solution, we had to write <code>struct TupleSet</code> three times!
+Writing so much code that does nothing is totally unacceptable.
+It is time to unveil the trick:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Overload operator+
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// Adding a `Type` to `std::tuple` procuces a new tuple
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// with `Type` as the last argument if `Type` was not in
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// tuple&#39;s arguments. The return type is the same as the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// original tuple otherwise
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Type, <span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>conditional_t<span style="color:#f92672">&lt;</span>
+</span></span><span style="display:flex;"><span>    (std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false),
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types..., Type<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>, Type);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Note that no definition is provided for this overload
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// There&#39;s not going to be one: we only need this for type
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// deduction and we don&#39;t want it to be called from the
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e">// acutual running code.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Use C++17 fold expressions to bypass writing a recursive template
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> TupleSetT <span style="color:#f92672">=</span> <span style="color:#66d9ef">decltype</span>((std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;&gt;</span>() <span style="color:#f92672">+</span> ... <span style="color:#f92672">+</span> std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>()));
+</span></span></code></pre></div><p>We did almost twice better in terms of lines of code written!
+Readability has decreased, however, but only so slightly: I wouldn&rsquo;t call it a dramatic decline since the original code didn&rsquo;t look all that nice either.
+Most importantly, this completely replaces the recursive template that needed to be specialized to terminate the sequence: fold expression is automatically expanded to include each of the arguments.
+This is a handy little trick to organize recursive process on templates without explicit recursion.</p>
+<p><em>Now, I will start slowly moving to motivating the necessity for extension methods, or, rather, an upgrade to operators <code>.</code> and <code>-&gt;</code>.
+If you only care about the trick, either read the whole thing to learn about its problems, or go right to the <a href="#appendix-more-toy-examples">Appendix</a> for other examples of using it.</em></p>
+<h2 id="air-pollution">Air pollution</h2>
+<p>What I&rsquo;ve just described is great for toying around, but how will we go about it in a real codebase?
+We&rsquo;ll probably have to implement it (or something alike) for a custom template rather than <code>std::tuple</code>, or (why not?!) for an arbitrary template.
+Also, we wouldn&rsquo;t want this to prevent us from using <code>operator+</code> (or whatever other operator we&rsquo;ve picked) in a meaningful way on our types (or any arbitrary type, for that matter!).
+For example, we might want to add a value of some type to our container, but we wouldn&rsquo;t be able because it still will fall into our <code>operator+</code> overload.</p>
+<p>What do we do?
+Naturally, we need to make the trick <code>operator+</code> our little implementation secret.
+Idea: we&rsquo;ll declare it the <code>detail</code> namespace and only use it in there!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> detail {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Type, <span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>conditional_t<span style="color:#f92672">&lt;</span>...<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>, Type);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>But we want to use it from the outside.
+How?
+It would be great if we had some way to specify the namespace for the infix operator like</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Looks ugly, but will do for a niche application
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{} detail<span style="color:#f92672">::+</span> <span style="color:#66d9ef">int</span>{}
+</span></span></code></pre></div><p>But we don&rsquo;t.</p>
+<p>Well, we could access it directly as a function via <code>detail::operator+()</code> but that defeats the entire purpose of being able to use it in a fold expression.
+Our only viable option is to declare everything that uses our hidden overload inside of the <code>detail</code> namespace as well, and either &rsquo;export&rsquo; it into parent namespace via <code>using</code> or to declare a separate (properly named and accessible!) helper inside of <code>detail</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> detail {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> TupleSetT <span style="color:#f92672">=</span> <span style="color:#66d9ef">decltype</span>((std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;&gt;</span>() <span style="color:#f92672">+</span> ... <span style="color:#f92672">+</span> std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>()));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> detail<span style="color:#f92672">::</span>TupleSetT;
+</span></span></code></pre></div><p>Phew, this doesn&rsquo;t look all that bad.
+Unless we wanted to use the <code>operator+</code> directly inside of a class.
+We can&rsquo;t &ndash; there is no way to import this operator overload to be accessible at class scope and at class scope only!
+We will still have to declare a named helper for this, even if we don&rsquo;t want to.</p>
+<p>And what if there is a winning specification for one of the templates already somewhere (<a href="https://godbolt.org/z/qK5f6xYqK">like this example</a>)?
+What do we do?</p>
+<h2 id="another-mans-treasure">Another man&rsquo;s treasure</h2>
+<p>As promised, let&rsquo;s take a step back and see how we could actually implement our <code>f()</code>.
+It&rsquo;s relatively easy if we give a meaning to our already existing <code>operator+</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> detail {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered Type, std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> tup, Type t) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">constexpr</span> ((std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> tupVal <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Type<span style="color:#f92672">&gt;</span>(tup);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (tupVal <span style="color:#f92672">&lt;</span> t) tupVal <span style="color:#f92672">=</span> t;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> tup;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>make_tuple(std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>(tup)..., t);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> f(Types... args) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">using</span> detail<span style="color:#f92672">::</span><span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>; <span style="color:#75715e">// Thankfully, available at function-scope
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{} <span style="color:#f92672">+</span> ... <span style="color:#f92672">+</span> args);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(f(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#ae81ff">1.2</span>) <span style="color:#f92672">==</span> std<span style="color:#f92672">::</span>make_tuple(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#e6db74">&#39;c&#39;</span>));
+</span></span></code></pre></div><p>Thanks to the fact that our functions aren&rsquo;t dummies anymore, we can get rid of <code>decltype</code> and <code>std::declval</code>.</p>
+<p>Overall, this solution looks relatively clean.
+But if we try to modify it somehow to accept, let&rsquo;s say, some generic class template that is tuple-like, the problem of a possible winning meaningful specialization of <code>operator+</code> (among other previously described and undescribed) arises.
+Sure, we can always try another binary operator, but what if <em>all</em> binary operators are defined for a certain template (unlikely, so here&rsquo;s a more reasonable concern: what if we aren&rsquo;t sure <em>what</em> binary operators might be defined for a certain template)?
+And what the hell is, for example, <code>std::tuple&lt;&gt;{} ^ ... ^ args</code> even supposed to mean from the readability standpoint?</p>
+<p>Enter extension methods.
+Well, not quite yet: they&rsquo;re not in C++, but we can get a pretty good idea of that they might look like from <a href="https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p0847r6.html">deducing this</a>.
+For our li&rsquo;l old <code>std::tuple</code> we would probably write an extension method as somethings like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered Type, std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> pushElementOfUniqueType(<span style="color:#66d9ef">this</span> std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> tup, Type t) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">constexpr</span> ((std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> tupVal <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Type<span style="color:#f92672">&gt;</span>(tup);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (tupVal <span style="color:#f92672">&lt;</span> t) tupVal <span style="color:#f92672">=</span> t;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> tup;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>make_tuple(std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>(tup)..., t);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is functionally identical, and far more readable and expressive then <code>+</code>.
+You can document it, and you don&rsquo;t necessarily have to hide it under the carpet of <code>detail</code> namespace.</p>
+<p>There is, however, one catch.
+To be able to do what we want we would need the ability to chain method/extension method calls via a fold expression somehow (we could already use fold expressions with <code>.*</code> and <code>-&gt;*</code> operators, but I struggle to find any way to use this for our purpose).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#75715e">// Just dreaming
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> f(Types... args) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{}. ...pushElementOfUniqueType(args);
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// or, maybe, even with a namespace!
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{}. ...detail<span style="color:#f92672">::</span>pushElementOfUniqueType(args)<span style="color:#f92672">?!</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We would be able to provide the interface that we are almost 100% sure does not interfere with any existing code (precisely 100% if we would be able to add a namespace specifiaction to the call).</p>
+<h2 id="no-we-have-ufcs-at-home">No, we have UFCS at home!</h2>
+<p>Dreaming is nice, but what can we do today?
+Well, while there is nothing even resmbling UFCS in C++ yet, we can go to&hellip; operator overloading again.
+<a href="https://cpptruths.blogspot.com/2017/01/folding-monadic-functions.html">We&rsquo;ll do it like here</a>, but uglier, picking an operator that&rsquo;s highly unlikely to be used in another context with our arguments.
+We get something like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T, <span style="color:#66d9ef">typename</span> Func<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">requires</span> std<span style="color:#f92672">::</span>invocable<span style="color:#f92672">&lt;</span>Func, T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">&gt;&gt;=</span>(T t, Func func) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">func</span>(t);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">f</span>(<span style="color:#66d9ef">auto</span>... args) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> op <span style="color:#f92672">=</span> [] <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Type<span style="color:#f92672">&gt;</span> (Type arg) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> [arg] <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span> (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> tup) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#66d9ef">constexpr</span> ((std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false)) {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> tupVal <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Type<span style="color:#f92672">&gt;</span>(tup);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (tupVal <span style="color:#f92672">&lt;</span> arg) tupVal <span style="color:#f92672">=</span> arg;
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> tup;
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>make_tuple(std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>(tup)..., arg);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{} <span style="color:#f92672">&gt;&gt;=</span> ... <span style="color:#f92672">&gt;&gt;=</span> op(args));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(f(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#ae81ff">1.2</span>) <span style="color:#f92672">==</span> std<span style="color:#f92672">::</span>make_tuple(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#e6db74">&#39;c&#39;</span>));
+</span></span></code></pre></div><p>We can also try to simplify <code>f()</code> even further by creating a UFCS-like interface and defining an <code>operator&gt;&gt;=</code> only for it:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Callable, <span style="color:#66d9ef">typename</span>... Args<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CallPromise</span> {
+</span></span><span style="display:flex;"><span>    std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Args...<span style="color:#f92672">&gt;</span> args;
+</span></span><span style="display:flex;"><span>    Callable callable;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">constexpr</span> CallPromise(Callable callable_, Args... args_) <span style="color:#f92672">:</span> callable(callable_), args(args_...) {}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">requires</span> std<span style="color:#f92672">::</span>invocable<span style="color:#f92672">&lt;</span>Callable, T, Args...<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#66d9ef">operator</span>()(T t) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>apply([<span style="color:#66d9ef">this</span>, t] (Args... targs) { <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>callable(t, targs...); }, args);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> T, <span style="color:#66d9ef">typename</span> Callable, <span style="color:#66d9ef">typename</span>... Args<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">requires</span> std<span style="color:#f92672">::</span>invocable<span style="color:#f92672">&lt;</span>CallPromise<span style="color:#f92672">&lt;</span>Callable, Args...<span style="color:#f92672">&gt;</span>, T<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">&gt;&gt;=</span>(T t, CallPromise<span style="color:#f92672">&lt;</span>Callable, Args...<span style="color:#f92672">&gt;</span> promise) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">promise</span>(t);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Can&#39;t pass function template as an agrument - hence the lambda
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> pushElementOfUniqueType <span style="color:#f92672">=</span>
+</span></span><span style="display:flex;"><span>    []
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered Type, std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> tup, Type t) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">constexpr</span> ((std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false)) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> tupVal <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Type<span style="color:#f92672">&gt;</span>(tup);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (tupVal <span style="color:#f92672">&lt;</span> t) tupVal <span style="color:#f92672">=</span> t;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> tup;
+</span></span><span style="display:flex;"><span>        } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>make_tuple(std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>(tup)..., t);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">f</span>(<span style="color:#66d9ef">auto</span>... args) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{} <span style="color:#f92672">&gt;&gt;=</span> ... <span style="color:#f92672">&gt;&gt;=</span> CallPromise(pushElementOfUniqueType, args));
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(f(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#e6db74">&#39;c&#39;</span>, <span style="color:#ae81ff">1.2</span>) <span style="color:#f92672">==</span> std<span style="color:#f92672">::</span>make_tuple(<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2.3</span>, <span style="color:#e6db74">&#39;c&#39;</span>));
+</span></span></code></pre></div><p>This is a lot of code but also arguably the least invasive solution: there are no operator overloads for types other than the ones provided by the interface itself.
+In addition to a relatively large boilerplate for such conceptually simple task, there are other drawbacks: this will only work with lambdas (or other functor objects) as function templates cannot be passed directly as an argument to <code>CallPromise</code> constructor.
+This is a big restiction to the way we interact with this API (and to our ability to construct a better one), dictated only by the lack of UFCS support in the language.</p>
+<h2 id="weve-been-compromised">We&rsquo;ve been compromised</h2>
+<p>Extension methods are an opt-in compromise between UFCS and the complete lack of it.
+It affects only user-specified functions, but might be seen by some as possibly breaking APIs.
+There is, however, another contender.
+<a href="https://open-std.org/JTC1/SC22/WG21/docs/papers/2020/p2011r0.html">Pipeline-rewrite operator</a> provides a whole new syntax which could affect all free functions (there is nothing about folding in the proposal, so I would <em>dream</em> that it is implied):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>totally_ordered Type, std<span style="color:#f92672">::</span>totally_ordered... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> pushElementOfUniqueType(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span> tup, Type t) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">constexpr</span> ((std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>Types, Type<span style="color:#f92672">&gt;</span> <span style="color:#f92672">||</span> ... <span style="color:#f92672">||</span> false)) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">auto</span><span style="color:#f92672">&amp;</span> tupVal <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Type<span style="color:#f92672">&gt;</span>(tup);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (tupVal <span style="color:#f92672">&lt;</span> t) tupVal <span style="color:#f92672">=</span> t;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> tup;
+</span></span><span style="display:flex;"><span>    } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> std<span style="color:#f92672">::</span>make_tuple(std<span style="color:#f92672">::</span>get<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>(tup)..., t);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">constexpr</span> <span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">f</span>(<span style="color:#66d9ef">auto</span>... args) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;</span>{} <span style="color:#f92672">|&gt;</span> ... <span style="color:#f92672">|&gt;</span> pushElementOfUniqueType(args));
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>I would still argue that this is less elegant than folding extension methods (also, <code>|&gt;</code> would not be callable on the regular class methods), it is, to my liking, one of the nicer solutions to the problem.</p>
+<p><em>Pipeline-rewrite proposal also explores into the flaws of using <code>operator|</code> as a Pipeline Operator.</em></p>
+<h2 id="one-small-miracle">One small miracle</h2>
+<p>As you might&rsquo;ve guessed, I really want to see extension methods in C++.
+I would also agree for pipeline-rewrite operator.
+I might even go crazy and accepts UFCS for all free functions just out of despair.</p>
+<p>I see the &ldquo;perfect&rdquo; extension methods implementation in C++ Standard (hopefully, some revision before I turn 30) as promotion of operators <code>.</code> and <code>-&gt;</code> to provide pipeline-rewrite syntax to functions declared with &ldquo;Deducing this&rdquo;-like syntax and fold expression support.
+Depsite the fact that the possible use cases of fold expressions on regular methods might be obscure, I still find it reasonable not to introduce an entire new operator into the language just to do similar job to <code>.</code> and <code>-&gt;</code>, but with less flexibility (<code>|&gt;</code> will not allow to extend certain types to be usable in generic functions using member-call syntax).</p>
+<p>Aside from the crasy possibilities extension methods/pipeline-rewrite would offer (in the case they get a proper fold expression support), there are also much more grounded uses for them including (but not limited to!) wrapping C APIs, preparing your codebase to simplify future standard library updates (like adding a custom <code>.contains()</code> to the string until C++23 becomes usable) and reducing the amount of parenthesis required to write map-reduce (kind of already solved by ranges using&hellip; operator overloads).</p>
+<p>There are possible problems with this, but, the way I see it, there is no unwritten rule extension methods violate that operator overloads do not already.
+Most of them are related to the problematic method/operator being in scopre or not, and are solvable by allowing programmers to explicitly specify from which namesapace the extension/operator should be taken.</p>
+<p>If introduced, extension methods, as most of C++, could be a powerful, but also dangerous in inexperienced hands tool that would allow programmers with proper understanding of the mechanism write cleaner, more readable code.</p>
+<hr>
+<p><em>Dear C++ Santa Comittee!</em></p>
+<p><em>Writes to you a little C++ programmer.</em>
+<em>Even though I come from a place where Christmas is not as widely celebrated and kids write to Granpa Frost instead of Santa, I couldn&rsquo;t think of a pun that would use this.</em>
+<em>Still, New Year and Christmas are pretty close, so why don&rsquo;t I give writing <strong>you</strong> a shot?</em></p>
+<p><em>The two things that I wish the most for the next C++ standard are fold expressions for object/pointer method calls and extension methods.</em>
+<em>There are a lot of cool features to tackle and want, but I am humble: give me this, and I&rsquo;ll probably be happy for several revisions.</em></p>
+<p><em>I wasn&rsquo;t naughty: I respected my supervisor and I&rsquo;ve been writing C++.</em>
+<em>I haven&rsquo;t done bad things, oh no-no, I didn&rsquo;t.</em>
+<em>Except for that one time I made changes to a Rust project, but that doesn&rsquo;t count, right?</em></p>
+<p><em>I am 23 year old, but I want to believe in a little CXX-mas miracle.</em>
+<em>Pretty please, Santa? You wouldn&rsquo;t leave a junior dev without a present would you?</em></p>
+<p><em>Sincerely yours, GregTheMadMonk.</em></p>
+<hr>
+<h2 id="appendix-more-toy-examples">Appendix: More toy examples</h2>
+<p>These examples, especially <a href="#find-tuples-nth-argument-without-stdget">Find <code>std::tuple</code>&rsquo;s Nth argument</a>, are not very useful for <code>std::tuple</code>.
+They could be, however, implemented for any other template, where they may turn out to be very handy.</p>
+<h3 id="reverse-tuple-arguments">Reverse tuple arguments</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> Type, <span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Type, Types...<span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>, Type);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">auto</span> TupleInvHelper(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">decltype</span>(
+</span></span><span style="display:flex;"><span>    (std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;&gt;&gt;</span>() <span style="color:#f92672">+</span> ... <span style="color:#f92672">+</span> std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>())
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span><span style="color:#66d9ef">typename</span> TupleType<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> TupleInvT <span style="color:#f92672">=</span> <span style="color:#66d9ef">decltype</span>(TupleInvHelper(std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>TupleType<span style="color:#f92672">&gt;</span>()));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleInvT<span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">char</span>, <span style="color:#66d9ef">float</span><span style="color:#f92672">&gt;&gt;</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">float</span>, <span style="color:#66d9ef">char</span>, <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span>);
+</span></span></code></pre></div><h3 id="find-tuples-nth-argument-without-stdget">Find tuple&rsquo;s Nth argument without <code>std::get</code></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c++" data-lang="c++"><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>size_t index, std<span style="color:#f92672">::</span>size_t find, <span style="color:#66d9ef">typename</span> T <span style="color:#f92672">=</span> <span style="color:#66d9ef">void</span><span style="color:#f92672">&gt;</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Tag</span> { <span style="color:#66d9ef">using</span> Type <span style="color:#f92672">=</span> T; };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>size_t index, std<span style="color:#f92672">::</span>size_t find, <span style="color:#66d9ef">typename</span> TagT, <span style="color:#66d9ef">typename</span> Type<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>Tag<span style="color:#f92672">&lt;</span>index <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, find, std<span style="color:#f92672">::</span>conditional_t<span style="color:#f92672">&lt;</span>index <span style="color:#f92672">==</span> find, Type, TagT<span style="color:#f92672">&gt;&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">operator</span><span style="color:#f92672">+</span>(Tag<span style="color:#f92672">&lt;</span>index, find, TagT<span style="color:#f92672">&gt;</span>, Type);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>size_t index, <span style="color:#66d9ef">typename</span>... Types<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">auto</span> TupleGetHelper(std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span>Types...<span style="color:#f92672">&gt;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">decltype</span>(
+</span></span><span style="display:flex;"><span>    (std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>Tag<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">0</span>, index<span style="color:#f92672">&gt;&gt;</span>() <span style="color:#f92672">+</span> ... <span style="color:#f92672">+</span> std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>Types<span style="color:#f92672">&gt;</span>())
+</span></span><span style="display:flex;"><span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">template</span> <span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>size_t index, <span style="color:#66d9ef">typename</span> TupleType<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> TupleGetT <span style="color:#f92672">=</span> <span style="color:#66d9ef">typename</span> <span style="color:#66d9ef">decltype</span>(TupleGetHelper<span style="color:#f92672">&lt;</span>index<span style="color:#f92672">&gt;</span>(std<span style="color:#f92672">::</span>declval<span style="color:#f92672">&lt;</span>TupleType<span style="color:#f92672">&gt;</span>()))<span style="color:#f92672">::</span>Type;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleGetT<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">0</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span>, <span style="color:#66d9ef">char</span><span style="color:#f92672">&gt;&gt;</span>, <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleGetT<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">1</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span>, <span style="color:#66d9ef">char</span><span style="color:#f92672">&gt;&gt;</span>, <span style="color:#66d9ef">float</span><span style="color:#f92672">&gt;</span>);
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">static_assert</span>(std<span style="color:#f92672">::</span>same_as<span style="color:#f92672">&lt;</span>TupleGetT<span style="color:#f92672">&lt;</span><span style="color:#ae81ff">2</span>, std<span style="color:#f92672">::</span>tuple<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">float</span>, <span style="color:#66d9ef">char</span><span style="color:#f92672">&gt;&gt;</span>, <span style="color:#66d9ef">char</span><span style="color:#f92672">&gt;</span>);
+</span></span></code></pre></div><p><em>Thanks to u/scatters for continuing the discussion on this topic 4 months after the original post.</em></p>
+
+
+<p>&nbsp;</p>
+<hr>
+
+<p class="ps">
+<i>
+If you've enjoyed reading this, or have any comments, I'm looking forward for your feedback at <a href="mailto:yagreg7@gmail.com">yagreg7@gmail.com</a>
+</i>
+</p>
+
+        </main>
+    </body>
+</html>

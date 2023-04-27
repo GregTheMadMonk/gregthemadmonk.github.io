@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://gregthemadmonk.github.io/posts/operator-folding-tricks/</loc>
+    <loc>https://gregthemadmonk.github.io/posts/fold-expressions-to-extension-methods/</loc>
     <lastmod>2023-04-22T01:27:54+03:00</lastmod>
   </url><url>
     <loc>https://gregthemadmonk.github.io/</loc>

@@ -9,12 +9,11 @@
     <lastBuildDate>Sat, 22 Apr 2023 01:27:54 +0300</lastBuildDate><atom:link href="https://gregthemadmonk.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Fold Expressions for Metaprogramming or &#34;The Wrong Reason to Rightfully Want Extension Methods in C&#43;&#43;&#34;</title>
-      <link>https://gregthemadmonk.github.io/posts/operator-folding-tricks/</link>
+      <link>https://gregthemadmonk.github.io/posts/fold-expressions-to-extension-methods/</link>
       <pubDate>Sat, 22 Apr 2023 01:27:54 +0300</pubDate>
       
-      <guid>https://gregthemadmonk.github.io/posts/operator-folding-tricks/</guid>
-      <description>Disclaimer: when writing code examples for that article, I wasn&amp;rsquo;t really concerned with passing/returning references where it might make actual sense in real scenarios. The code here is for demonstration, only to provide you with an idea of the tricks that could be used to write actual optimized code.
-Toy problem Consider the following problem: you are asked to write a function that will accept an arbitrary number of arguments of arbitrary types satisfying the std::totally_ordered concept.</description>
+      <guid>https://gregthemadmonk.github.io/posts/fold-expressions-to-extension-methods/</guid>
+      <description>Disclaimer: when writing code examples for that article, I wasn&amp;rsquo;t really concerned with passing/returning references where it might make actual sense in real scenarios. All examples here are for demonstration, only to provide you with an idea of the tricks that could be used to write actual code. I have personally encountered cases where snippets written naively (by me), like the ones in this article, would break, as a result of being used on non-copyable types.</description>
     </item>
     
   </channel>

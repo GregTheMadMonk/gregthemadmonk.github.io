@@ -4,24 +4,25 @@ date: 2023-04-22T01:27:54+03:00
 draft: false
 ---
 
-__Disclaimer:__ when writing code examples for that article, I wasn't really concerned with passing/returning references where it might make actual sense in real scenarios.
-The code here is for demonstration, only to provide you with an idea of the tricks that could be used to write actual optimized code.
+*__Disclaimer:__ when writing code examples for that article, I wasn't really concerned with passing/returning references where it might make actual sense in real scenarios.
+All examples here are for demonstration, only to provide you with an idea of the tricks that could be used to write actual code.
+I have personally encountered cases where snippets written naively (by me), like the ones in this article, would break, as a result of being used on non-copyable types.
+Still, I consider the basic concepts and ideas described here worth sharing.*
 
 ## Toy problem
 
 Consider the following problem: you are asked to write a function that will accept an arbitrary number of arguments of arbitrary types satisfying the `std::totally_ordered` concept.
 The function must return an `std::tuple` with max argument passed for each type.
 
-Disclamer: we will not write this function for now.
-All that's of the intereset for the purpose of the beginning this article is the return type of that function.
-In short, for
+Don't try to write a complete implementation for it yet (we will write it later).
+I want you to start with performing another exercie: computing a return type for such function: for a black-box function
 ```c++
 template <std::totally_ordered... Types>
 SomeStdTupleInstance f(Types...) {
     /* The implementation we don't care about for now */
 }
 ```
-we want to create an `std::tuple` that will contain every type from `Types` once and only once.
+we need to write `SomeStdTupleInstance`.
 How do we do that?
 
 ## Toy solution
@@ -29,9 +30,13 @@ How do we do that?
 The first thing that comes to mind (for me it used to be that, at least) is to make some kind of recursive template.
 We will go over all of the types passed to us and conditionally append them to the accumulator:
 ```c++
+// Declare the template
 template <typename Tuple, typename... Types>
 struct TupleSet {};
 
+// Specialize for our case: carry our 'return value'
+// in the first template argument, and all the info
+// to process in the rest
 template <typename Type1, typename... Types, typename... TupleArgs>
 struct TupleSet<std::tuple<TupleArgs...>, Type1, Types...> {
     using Type = TupleSet<
@@ -45,8 +50,9 @@ struct TupleSet<std::tuple<TupleArgs...>, Type1, Types...> {
     >::Type;
 };
 
+// Terminating specialization: nothing left to process
 template <typename... TupleArgs>
-struct TupleSet<std::tuple<TupleArgs...>> { // Terminating specialization
+struct TupleSet<std::tuple<TupleArgs...>> {
     using Type = std::tuple<TupleArgs...>;
 };
 ```
@@ -68,39 +74,52 @@ template <std::totally_ordered... Types>
 TupleSetT<Types...> f(Types...);
 ```
 
+Not bad at all (it is pretty bad, IMO).
 But we can also do better.
 
 ## One man's trash
 
 In the previous solution, we had to write `struct TupleSet` three times!
-This is unacceptable and unreadable.
-We can do much better:
+Writing so much code that does nothing is totally unacceptable.
+It is time to unveil the trick:
 ```c++
+// Overload operator+
+// Adding a `Type` to `std::tuple` procuces a new tuple
+// with `Type` as the last argument if `Type` was not in
+// tuple's arguments. The return type is the same as the
+// original tuple otherwise
 template <typename Type, typename... Types>
 std::conditional_t<
     (std::same_as<Types, Type> || ... || false),
     std::tuple<Types...>, std::tuple<Types..., Type>
 > operator+(std::tuple<Types...>, Type);
+// Note that no definition is provided for this overload
+// There's not going to be one: we only need this for type
+// deduction and we don't want it to be called from the
+// acutual running code.
 
+// Use C++17 fold expressions to bypass writing a recursive template
 template<typename... Types>
 using TupleSetT = decltype((std::declval<std::tuple<>>() + ... + std::declval<Types>()));
 ```
 
 We did almost twice better in terms of lines of code written!
-Readability has decreased, however, I wouldn't call it a dramatic decline since the original code didn't look all that nice either.
-Most importantly, it completely replaces the recursive template that needed to be specialized to terminate the sequence: fold expression automatically has the length corresponding to the used parameter pack and needs no such tricks.
+Readability has decreased, however, but only so slightly: I wouldn't call it a dramatic decline since the original code didn't look all that nice either.
+Most importantly, this completely replaces the recursive template that needed to be specialized to terminate the sequence: fold expression is automatically expanded to include each of the arguments.
 This is a handy little trick to organize recursive process on templates without explicit recursion.
 
-For more examples of this trick, go to [Appendix](#appendix-more-toy-examples).
+_Now, I will start slowly moving to motivating the necessity for extension methods, or, rather, an upgrade to operators `.` and `->`.
+If you only care about the trick, either read the whole thing to learn about its problems, or go right to the [Appendix](#appendix-more-toy-examples) for other examples of using it._
 
 ## Air pollution
 
-What I've just described is good and all for toying around, but how will we go about it in a real codebase?
-We probably will have to implement some trick for a custom template rather than `std::tuple`, or (why not?!) for an arbitrary template.
-But now we wouldn't want our sneaky trick to prevent us from using `operator+` (or whatever else we've used) in a meaningful way on our types (or any arbitrary type, for that matter!).
+What I've just described is great for toying around, but how will we go about it in a real codebase?
+We'll probably have to implement it (or something alike) for a custom template rather than `std::tuple`, or (why not?!) for an arbitrary template.
+Also, we wouldn't want this to prevent us from using `operator+` (or whatever other operator we've picked) in a meaningful way on our types (or any arbitrary type, for that matter!).
 For example, we might want to add a value of some type to our container, but we wouldn't be able because it still will fall into our `operator+` overload.
 
-What do we do? Naturally, we need to make the trick `operator+` our little implementation secret.
+What do we do?
+Naturally, we need to make the trick `operator+` our little implementation secret.
 Idea: we'll declare it the `detail` namespace and only use it in there!
 
 ```c++
@@ -110,17 +129,19 @@ namespace detail {
 }
 ```
 
-How do we use it now?
+But we want to use it from the outside.
+How?
 It would be great if we had some way to specify the namespace for the infix operator like
 
 ```c++
+// Looks ugly, but will do for a niche application
 std::tuple<>{} detail::+ int{}
 ```
 
 But we don't.
 
 Well, we could access it directly as a function via `detail::operator+()` but that defeats the entire purpose of being able to use it in a fold expression.
-Our only reasonable option is to declare everything that uses it inside of `detail` namespace as well, and either provide it into parent namespace via `using` or to declare a separate helper.
+Our only viable option is to declare everything that uses our hidden overload inside of the `detail` namespace as well, and either 'export' it into parent namespace via `using` or to declare a separate (properly named and accessible!) helper inside of `detail`.
 
 ```c++
 namespace detail {
@@ -130,8 +151,9 @@ using TupleSetT = decltype((std::declval<std::tuple<>>() + ... + std::declval<Ty
 using detail::TupleSetT;
 ```
 
-This doesn't look all that bad.
-Unless, we wanted to use the `operator+` directly inside of a class. We can't -- there is no way to import this operator overload to be accessible at class scope and at class scope only!
+Phew, this doesn't look all that bad.
+Unless we wanted to use the `operator+` directly inside of a class.
+We can't -- there is no way to import this operator overload to be accessible at class scope and at class scope only!
 We will still have to declare a named helper for this, even if we don't want to.
 
 And what if there is a winning specification for one of the templates already somewhere ([like this example](https://godbolt.org/z/qK5f6xYqK))?
@@ -139,7 +161,7 @@ What do we do?
 
 ## Another man's treasure
 
-Let's take a step back and see how we could actually implement our `f()`.
+As promised, let's take a step back and see how we could actually implement our `f()`.
 It's relatively easy if we give a meaning to our already existing `operator+`:
 
 ```c++
@@ -168,9 +190,9 @@ static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
 Thanks to the fact that our functions aren't dummies anymore, we can get rid of `decltype` and `std::declval`.
 
 Overall, this solution looks relatively clean.
-But if we try to modify it somehow to accept, let's say, some generic class template that is tuple-like, the problem of a possible winning meaningful specialization of `operator+` arises.
-Sure, we can always try another binary operator, but what if _all_ binary operators are defined for a certain template?
-And what the hell is, for example, `std::tuple<>{} ^ ... ^ args` even supposed to mean from the readability standpoint.
+But if we try to modify it somehow to accept, let's say, some generic class template that is tuple-like, the problem of a possible winning meaningful specialization of `operator+` (among other previously described and undescribed) arises.
+Sure, we can always try another binary operator, but what if _all_ binary operators are defined for a certain template (unlikely, so here's a more reasonable concern: what if we aren't sure _what_ binary operators might be defined for a certain template)?
+And what the hell is, for example, `std::tuple<>{} ^ ... ^ args` even supposed to mean from the readability standpoint?
 
 Enter extension methods.
 Well, not quite yet: they're not in C++, but we can get a pretty good idea of that they might look like from [deducing this](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p0847r6.html).
@@ -188,16 +210,18 @@ constexpr auto pushElementOfUniqueType(this std::tuple<Types...> tup, Type t) {
 }
 ```
 
-In my humble opinion, `tup.pushElementOfUniqueType(2)` is more meaningful than `tup + 2`.
+This is functionally identical, and far more readable and expressive then `+`.
 You can document it, and you don't necessarily have to hide it under the carpet of `detail` namespace.
 
 There is, however, one catch.
 To be able to do what we want we would need the ability to chain method/extension method calls via a fold expression somehow (we could already use fold expressions with `.*` and `->*` operators, but I struggle to find any way to use this for our purpose).
 ```c++
+// Just dreaming
 template <std::totally_ordered... Types>
 constexpr auto f(Types... args) {
     return std::tuple<>{}. ...pushElementOfUniqueType(args);
-    // or, maybe, even ...detail::pushElementOfUniqueType(args)?!
+    // or, maybe, even with a namespace!
+    return std::tuple<>{}. ...detail::pushElementOfUniqueType(args)?!
 }
 ```
 
@@ -205,7 +229,7 @@ We would be able to provide the interface that we are almost 100% sure does not 
 
 ## No, we have UFCS at home!
 
-What can we do now?
+Dreaming is nice, but what can we do today?
 Well, while there is nothing even resmbling UFCS in C++ yet, we can go to... operator overloading again.
 [We'll do it like here](https://cpptruths.blogspot.com/2017/01/folding-monadic-functions.html), but uglier, picking an operator that's highly unlikely to be used in another context with our arguments.
 We get something like this:
@@ -235,7 +259,7 @@ constexpr auto f(auto... args) {
 static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
 ```
 
-We can also try simplify `f()` even further by creating a UFCS-like interface and defining an `operator>>=` only for it:
+We can also try to simplify `f()` even further by creating a UFCS-like interface and defining an `operator>>=` only for it:
 
 ```c++
 template <typename Callable, typename... Args>
@@ -257,6 +281,7 @@ constexpr auto operator>>=(T t, CallPromise<Callable, Args...> promise) {
     return promise(t);
 }
 
+// Can't pass function template as an agrument - hence the lambda
 constexpr auto pushElementOfUniqueType =
     []
     <std::totally_ordered Type, std::totally_ordered... Types>
@@ -277,12 +302,16 @@ constexpr auto f(auto... args) {
 static_assert(f(1, 2, 2.3, 5, 'c', 1.2) == std::make_tuple(5, 2.3, 'c'));
 ```
 
-This is a lot of code but arguably the least invasive solution: there are no operator overloads for types other than the ones providing the interface itself.
-There also are drawbacks: this will only work with lambdas as function templates cannot be passed directly as an argument to `CallPromise` constructor, in addition to a relatively large boilerplate for such a conceptually simple task.
-Not that I'm afraid of boilerplate -- still, it would be nice if we had a built-in language feature for this that would've worked with all functions, function objects and function templates.
-And, aside from the extension methods and whatever we just wrote here, there might be another way.
-Not now, of course, the best C++ features are not in the language yet.
-But still, take a look at [pipeline-rewrite operator](https://open-std.org/JTC1/SC22/WG21/docs/papers/2020/p2011r0.html) (or, rather, how I imagine it would work if `|>` operator gets fold expressions):
+This is a lot of code but also arguably the least invasive solution: there are no operator overloads for types other than the ones provided by the interface itself.
+In addition to a relatively large boilerplate for such conceptually simple task, there are other drawbacks: this will only work with lambdas (or other functor objects) as function templates cannot be passed directly as an argument to `CallPromise` constructor.
+This is a big restiction to the way we interact with this API (and to our ability to construct a better one), dictated only by the lack of UFCS support in the language.
+
+## We've been compromised
+
+Extension methods are an opt-in compromise between UFCS and the complete lack of it.
+It affects only user-specified functions, but might be seen by some as possibly breaking APIs.
+There is, however, another contender.
+[Pipeline-rewrite operator](https://open-std.org/JTC1/SC22/WG21/docs/papers/2020/p2011r0.html) provides a whole new syntax which could affect all free functions (there is nothing about folding in the proposal, so I would _dream_ that it is implied):
 
 ```c++
 template <std::totally_ordered Type, std::totally_ordered... Types>
@@ -303,11 +332,16 @@ constexpr auto f(auto... args) {
 
 I would still argue that this is less elegant than folding extension methods (also, `|>` would not be callable on the regular class methods), it is, to my liking, one of the nicer solutions to the problem.
 
+_Pipeline-rewrite proposal also explores into the flaws of using `operator|` as a Pipeline Operator._
+
 ## One small miracle
 
 As you might've guessed, I really want to see extension methods in C++.
 I would also agree for pipeline-rewrite operator.
 I might even go crazy and accepts UFCS for all free functions just out of despair.
+
+I see the "perfect" extension methods implementation in C++ Standard (hopefully, some revision before I turn 30) as promotion of operators `.` and `->` to provide pipeline-rewrite syntax to functions declared with "Deducing this"-like syntax and fold expression support.
+Depsite the fact that the possible use cases of fold expressions on regular methods might be obscure, I still find it reasonable not to introduce an entire new operator into the language just to do similar job to `.` and `->`, but with less flexibility (`|>` will not allow to extend certain types to be usable in generic functions using member-call syntax).
 
 Aside from the crasy possibilities extension methods/pipeline-rewrite would offer (in the case they get a proper fold expression support), there are also much more grounded uses for them including (but not limited to!) wrapping C APIs, preparing your codebase to simplify future standard library updates (like adding a custom `.contains()` to the string until C++23 becomes usable) and reducing the amount of parenthesis required to write map-reduce (kind of already solved by ranges using... operator overloads).
 
@@ -383,3 +417,5 @@ static_assert(std::same_as<TupleGetT<0, std::tuple<int, float, char>>, int>);
 static_assert(std::same_as<TupleGetT<1, std::tuple<int, float, char>>, float>);
 static_assert(std::same_as<TupleGetT<2, std::tuple<int, float, char>>, char>);
 ```
+
+_Thanks to u/scatters for continuing the discussion on this topic 4 months after the original post._
