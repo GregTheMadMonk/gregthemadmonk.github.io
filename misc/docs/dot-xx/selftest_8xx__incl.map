@@ -1,0 +1,14 @@
+<map id="/home/greg/projects/cpp/dot&#45;xx/selftest/src/selftest.xx" name="/home/greg/projects/cpp/dot&#45;xx/selftest/src/selftest.xx">
+<area shape="rect" id="Node000001" title="Main interface file for dxx::selftest module." alt="" coords="97,5,248,67"/>
+<area shape="rect" id="Node000002" href="$compat_8xx.html" title="Interface file for cxx.cstd.compat module." alt="" coords="5,115,135,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,69,98,107,94,103,137,65"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="152,266,193,294"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="175,68,175,251,170,251,170,68"/>
+<area shape="rect" id="Node000005" href="$assert_8xx.html" title="Main and only file of the dxx.assert module." alt="" coords="211,191,300,218"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="190,66,244,175,240,178,185,69"/>
+<area shape="rect" id="Node000003" href="$cstd_8xx.html" title="Main interface file for dxx.cstd module." alt="" coords="33,191,110,218"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,143,73,175,68,175,68,143"/>
+<area shape="poly" id="edge4_Node000003_Node000003" title=" " alt="" coords="110,188,128,192,136,204,133,213,126,218,123,214,129,210,131,205,125,196,109,193"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="91,217,144,255,141,259,88,221"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="242,221,200,258,197,254,239,217"/>
+</map>
