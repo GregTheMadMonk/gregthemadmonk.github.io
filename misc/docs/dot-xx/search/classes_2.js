@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['unit_5ftest_0',['unit_test',['../classdxx_1_1selftest_1_1unit__test.html',1,'dxx::selftest']]]
+  ['test_5ffailure_0',['test_failure',['../structdxx_1_1selftest_1_1test__failure.html',1,'dxx::selftest']]]
 ];

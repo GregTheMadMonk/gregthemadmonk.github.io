@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['test_5ffailure_0',['test_failure',['../structdxx_1_1selftest_1_1test__failure.html',1,'dxx::selftest']]]
+  ['overload_0',['overload',['../structdxx_1_1overload_1_1overload.html',1,'dxx::overload']]]
 ];

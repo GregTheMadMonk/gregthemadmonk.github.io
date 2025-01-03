@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['test_0',['test',['../namespacedxx_1_1selftest.html#ad01f2ed983e1e20a193bf83c020e75a7',1,'dxx::selftest']]]
+  ['run_5fall_0',['run_all',['../namespacedxx_1_1selftest.html#abaa7ed75cd9aad2dad39d4319b63ff5d',1,'dxx::selftest']]]
 ];
