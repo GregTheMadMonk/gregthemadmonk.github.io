@@ -1,7 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,36,124,64"/>
-<area shape="rect" id="Node000001" href="$structdxx_1_1assert_1_1failure.html" title="A default error type that is thrown when the assertion fails." alt="" coords="172,5,315,33"/>
-<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="139,34,171,29,172,34,139,40"/>
-<area shape="rect" id="Node000002" href="$structdxx_1_1selftest_1_1test__failure.html" title="The exception type used by test assertions." alt="" coords="176,57,310,102"/>
-<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="139,59,176,66,176,71,138,65"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,35,113,61"/>
+<area shape="rect" id="Node000001" href="$structdxx_1_1assert_1_1failure.html" title="A default error type that is thrown when the assertion fails." alt="" coords="161,5,290,32"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="127,33,160,27,161,33,128,39"/>
+<area shape="rect" id="Node000002" href="$structdxx_1_1selftest_1_1test__failure.html" title="The exception type used by test assertions." alt="" coords="164,56,287,99"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="129,58,164,64,163,69,128,63"/>
 </map>

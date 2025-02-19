@@ -1,5 +1,5 @@
 <map id="dxx::selftest::test_failure" name="dxx::selftest::test_failure">
-<area shape="rect" id="Node000001" title="The exception type used by test assertions." alt="" coords="5,81,140,126"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="13,5,132,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,49,75,80,70,80,70,49"/>
+<area shape="rect" id="Node000001" title="The exception type used by test assertions." alt="" coords="5,80,129,123"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="13,5,121,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,48,70,80,64,80,64,48"/>
 </map>

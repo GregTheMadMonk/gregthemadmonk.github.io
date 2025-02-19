@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,14,52,42"/>
-<area shape="rect" id="Node000001" href="$structdxx_1_1overload_1_1overload.html" title="Overload pattern implementation. Itself does not differ from https://www.cppstories...." alt="" coords="100,5,275,50"/>
-<area shape="poly" id="edge3_Node000000_Node000001" title=" " alt="" coords="67,25,99,25,99,30,67,30"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,13,52,40"/>
+<area shape="rect" id="Node000001" href="$structdxx_1_1overload_1_1overload.html" title="Overload pattern implementation. Itself does not differ from https://www.cppstories...." alt="" coords="100,5,256,48"/>
+<area shape="poly" id="edge3_Node000000_Node000001" title=" " alt="" coords="67,24,99,24,99,29,67,29"/>
 </map>

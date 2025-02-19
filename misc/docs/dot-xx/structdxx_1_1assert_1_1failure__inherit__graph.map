@@ -1,5 +1,5 @@
 <map id="dxx::assert::failure" name="dxx::assert::failure">
-<area shape="rect" id="Node000001" title="A default error type that is thrown when the assertion fails." alt="" coords="5,81,149,109"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="18,5,136,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,49,80,81,74,81,74,49"/>
+<area shape="rect" id="Node000001" title="A default error type that is thrown when the assertion fails." alt="" coords="5,80,135,107"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="16,5,124,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,48,73,80,67,80,67,48"/>
 </map>
