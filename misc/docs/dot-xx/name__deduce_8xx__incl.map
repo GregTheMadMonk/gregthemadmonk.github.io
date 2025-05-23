@@ -1,5 +1,5 @@
 <map id="/media/ssd/projects/cpp/dxx/selftest/src/name_deduce.xx" name="/media/ssd/projects/cpp/dxx/selftest/src/name_deduce.xx">
-<area shape="rect" id="Node000001" title="Unit test name deduction from variable name." alt="" coords="5,5,146,64"/>
+<area shape="rect" id="Node000001" title="Unit test name deduction from callable type name." alt="" coords="5,5,146,64"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="20,187,59,213"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,65,59,113,47,172,42,171,54,111,66,64"/>
 <area shape="rect" id="Node000003" href="$fixed_8xx.html" title="Interface file for dxx.cstd.fixed module." alt="" coords="69,112,172,139"/>
