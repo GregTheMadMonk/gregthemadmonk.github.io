@@ -105,6 +105,7 @@ $(function(){initNavTree('namespacedxx_1_1selftest.html',''); initResizable(true
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#concepts">Concepts</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
@@ -120,21 +121,49 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdxx_1_1selftest_1_1test__failure.html">test_failure</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The exception type used by test assertions.  <a href="structdxx_1_1selftest_1_1test__failure.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdxx_1_1selftest_1_1unit__test.html">unit_test</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an object of that class to declare a unit test.  <a href="classdxx_1_1selftest_1_1unit__test.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdxx_1_1selftest_1_1UnitTest.html">UnitTest</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an object of that class to declare a unit test.  <a href="classdxx_1_1selftest_1_1UnitTest.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="concepts" name="concepts"></a>
+Concepts</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptdxx_1_1selftest_1_1named__test__body.html">named_test_body</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a138c9d0c45d79a5c2c05acc812e2824a" id="r_a138c9d0c45d79a5c2c05acc812e2824a"><td class="memItemLeft" align="right" valign="top"><a id="a138c9d0c45d79a5c2c05acc812e2824a" name="a138c9d0c45d79a5c2c05acc812e2824a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>body_f</b> = std::function&lt;void()&gt;</td></tr>
-<tr class="separator:a138c9d0c45d79a5c2c05acc812e2824a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e18ee8a4036007bd0dfd79440f5b0b7" id="r_a1e18ee8a4036007bd0dfd79440f5b0b7"><td class="memItemLeft" align="right" valign="top"><a id="a1e18ee8a4036007bd0dfd79440f5b0b7" name="a1e18ee8a4036007bd0dfd79440f5b0b7"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>tests_map</b> = std::map&lt;std::string, body_f&gt;</td></tr>
-<tr class="separator:a1e18ee8a4036007bd0dfd79440f5b0b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b93cde2f193d7bfc789ad8b9ed05b42" id="r_a8b93cde2f193d7bfc789ad8b9ed05b42"><td class="memItemLeft" align="right" valign="top"><a id="a8b93cde2f193d7bfc789ad8b9ed05b42" name="a8b93cde2f193d7bfc789ad8b9ed05b42"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>TestBody</b> = std::function&lt;void()&gt;</td></tr>
+<tr class="separator:a8b93cde2f193d7bfc789ad8b9ed05b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85b79054cb05dd15899852075575b3c4" id="r_a85b79054cb05dd15899852075575b3c4"><td class="memItemLeft" align="right" valign="top"><a id="a85b79054cb05dd15899852075575b3c4" name="a85b79054cb05dd15899852075575b3c4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>TestsMap</b> = std::map&lt;std::string, TestBody&gt;</td></tr>
+<tr class="separator:a85b79054cb05dd15899852075575b3c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a63ced55ad03368aa9cfd557252544fd3" id="r_a63ced55ad03368aa9cfd557252544fd3"><td class="memTemplParams" colspan="2">template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:a63ced55ad03368aa9cfd557252544fd3"><td class="memTemplItemLeft" align="right" valign="top">consteval std::string_view&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a63ced55ad03368aa9cfd557252544fd3">function_name</a> ()</td></tr>
+<tr class="memdesc:a63ced55ad03368aa9cfd557252544fd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forwards its own <code>std::source_location::function_name()</code>  <br /></td></tr>
+<tr class="separator:a63ced55ad03368aa9cfd557252544fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b3de5700058a3000d2e56b31ef964e3" id="r_a6b3de5700058a3000d2e56b31ef964e3"><td class="memTemplParams" colspan="2"><a id="a6b3de5700058a3000d2e56b31ef964e3" name="a6b3de5700058a3000d2e56b31ef964e3"></a>
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:a6b3de5700058a3000d2e56b31ef964e3"><td class="memTemplItemLeft" align="right" valign="top">consteval auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>function_name_sanitize</b> ()</td></tr>
+<tr class="memdesc:a6b3de5700058a3000d2e56b31ef964e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes anonymous namespace mentions from the function name. <br /></td></tr>
+<tr class="separator:a6b3de5700058a3000d2e56b31ef964e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d50bf496faf9d6693b551372f345ee8" id="r_a5d50bf496faf9d6693b551372f345ee8"><td class="memTemplParams" colspan="2">template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:a5d50bf496faf9d6693b551372f345ee8"><td class="memTemplItemLeft" align="right" valign="top">consteval std::tuple&lt; std::optional&lt; std::string_view &gt;, uz &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="#a5d50bf496faf9d6693b551372f345ee8">get_test_name_cpp</a> ()</td></tr>
+<tr class="memdesc:a5d50bf496faf9d6693b551372f345ee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the C++ name of the type's scope (if it starts with <code>test::</code>) and gets rid of the <code>test::</code> part, e.g. for <code>test::a::b::c</code> it will return <code>a::b::c</code>  <br /></td></tr>
+<tr class="separator:a5d50bf496faf9d6693b551372f345ee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add08cd735bffb594d6e5288544707cb7" id="r_add08cd735bffb594d6e5288544707cb7"><td class="memTemplParams" colspan="2"><a id="add08cd735bffb594d6e5288544707cb7" name="add08cd735bffb594d6e5288544707cb7"></a>
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:add08cd735bffb594d6e5288544707cb7"><td class="memTemplItemLeft" align="right" valign="top">consteval auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get_test_name_data</b> ()</td></tr>
+<tr class="memdesc:add08cd735bffb594d6e5288544707cb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convertes <a class="el" href="#a5d50bf496faf9d6693b551372f345ee8">get_test_name_cpp</a> return value into a fixed length character array (or an empty optional) <br /></td></tr>
+<tr class="separator:add08cd735bffb594d6e5288544707cb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae10cbc5f67422b2e4778fa8f65c5660" id="r_aae10cbc5f67422b2e4778fa8f65c5660"><td class="memTemplParams" colspan="2"><a id="aae10cbc5f67422b2e4778fa8f65c5660" name="aae10cbc5f67422b2e4778fa8f65c5660"></a>
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:aae10cbc5f67422b2e4778fa8f65c5660"><td class="memTemplItemLeft" align="right" valign="top">consteval std::optional&lt; std::string_view &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>get_test_name</b> ()</td></tr>
+<tr class="memdesc:aae10cbc5f67422b2e4778fa8f65c5660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get an optional <code>string_view</code> with the test name, or <code>nullopt</code> if not a test for some reason. <br /></td></tr>
+<tr class="separator:aae10cbc5f67422b2e4778fa8f65c5660"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad01f2ed983e1e20a193bf83c020e75a7" id="r_ad01f2ed983e1e20a193bf83c020e75a7"><td class="memItemLeft" align="right" valign="top"><a id="ad01f2ed983e1e20a193bf83c020e75a7" name="ad01f2ed983e1e20a193bf83c020e75a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::test</b> (bool condition, std::source_location st=std::source_location::current())</td></tr>
 <tr class="memdesc:ad01f2ed983e1e20a193bf83c020e75a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test assertion. Calls <a class="el" href="namespacedxx_1_1assert.html#a99dc3111a8e74ea086ee742407c6b812">dxx::assert::always</a> with <a class="el" href="structdxx_1_1selftest_1_1test__failure.html">test_failure</a>. <br /></td></tr>
@@ -145,13 +174,83 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::test</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a36039504bcddc37dedd8db6dda3950b4" id="r_a36039504bcddc37dedd8db6dda3950b4"><td class="memItemLeft" align="right" valign="top"><a id="a36039504bcddc37dedd8db6dda3950b4" name="a36039504bcddc37dedd8db6dda3950b4"></a>
-constinit std::unique_ptr&lt; tests_map &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>all_tests</b> = nullptr</td></tr>
-<tr class="separator:a36039504bcddc37dedd8db6dda3950b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9be8e3b8afb0ad5f5075f8f0b0d2a250" id="r_a9be8e3b8afb0ad5f5075f8f0b0d2a250"><td class="memItemLeft" align="right" valign="top"><a id="a9be8e3b8afb0ad5f5075f8f0b0d2a250" name="a9be8e3b8afb0ad5f5075f8f0b0d2a250"></a>
+constexpr auto&#160;</td><td class="memItemRight" valign="bottom"><b>test_prefix</b> = &quot;T = test::&quot;sv</td></tr>
+<tr class="separator:a9be8e3b8afb0ad5f5075f8f0b0d2a250"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add5504438945b7503e9414d87f514a17" id="r_add5504438945b7503e9414d87f514a17"><td class="memItemLeft" align="right" valign="top">constexpr std::array&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#add5504438945b7503e9414d87f514a17">anonymous_indicators</a></td></tr>
+<tr class="separator:add5504438945b7503e9414d87f514a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23c78c7b1849cfb8e5cc5a89cee74da3" id="r_a23c78c7b1849cfb8e5cc5a89cee74da3"><td class="memTemplParams" colspan="2"><a id="a23c78c7b1849cfb8e5cc5a89cee74da3" name="a23c78c7b1849cfb8e5cc5a89cee74da3"></a>
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </td></tr>
+<tr class="memitem:a23c78c7b1849cfb8e5cc5a89cee74da3"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><b>test_name</b> = <a class="el" href="#add08cd735bffb594d6e5288544707cb7">get_test_name_data</a>&lt;<a class="el" href="structFOf.html">T</a>&gt;()</td></tr>
+<tr class="memdesc:a23c78c7b1849cfb8e5cc5a89cee74da3"><td class="mdescLeft">&#160;</td><td class="mdescRight">A constexpr <code>string_view</code> returned by <a class="el" href="#aae10cbc5f67422b2e4778fa8f65c5660">get_test_name</a> should point to somewhere in the program memmory. This is that somewhere. <br /></td></tr>
+<tr class="separator:a23c78c7b1849cfb8e5cc5a89cee74da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c4cc9ba4f4359828c5f4299dc9c2fbe" id="r_a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="memItemLeft" align="right" valign="top">constinit std::unique_ptr&lt; TestsMap &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5c4cc9ba4f4359828c5f4299dc9c2fbe">all_tests</a> = nullptr</td></tr>
+<tr class="memdesc:a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Storage for all unit tests.  <br /></td></tr>
+<tr class="separator:a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Main namespace of <a class="el" href="namespacedxx_1_1selftest.html">dxx::selftest</a> module. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a63ced55ad03368aa9cfd557252544fd3" name="a63ced55ad03368aa9cfd557252544fd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63ced55ad03368aa9cfd557252544fd3">&#9670;&#160;</a></span>function_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string_view dxx::selftest::function_name </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel consteval">consteval</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Forwards its own <code>std::source_location::function_name()</code> </p>
+<p>Required because we want to use it as a constexpr variable and some compilers may skip specifying the template parameters for such. So we wrap it in a <code>consteval</code> function within which this value is not <code>constexpr</code>, but outside of which it can be used as such. </p>
+
+</div>
+</div>
+<a id="a5d50bf496faf9d6693b551372f345ee8" name="a5d50bf496faf9d6693b551372f345ee8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d50bf496faf9d6693b551372f345ee8">&#9670;&#160;</a></span>get_test_name_cpp()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename <a class="el" href="structFOf.html">T</a>&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::tuple&lt; std::optional&lt; std::string_view &gt;, uz &gt; dxx::selftest::get_test_name_cpp </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel consteval">consteval</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the C++ name of the type's scope (if it starts with <code>test::</code>) and gets rid of the <code>test::</code> part, e.g. for <code>test::a::b::c</code> it will return <code>a::b::c</code> </p>
+<dl class="section return"><dt>Returns</dt><dd>A tuple of C++ name of the type's scope (or <code>nullopt</code> if the scope is not test scope) and an expected length of the test name string </dd></dl>
+
+</div>
+</div>
 <a id="abaa7ed75cd9aad2dad39d4319b63ff5d" name="abaa7ed75cd9aad2dad39d4319b63ff5d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abaa7ed75cd9aad2dad39d4319b63ff5d">&#9670;&#160;</a></span>run_all()</h2>
 
@@ -177,20 +276,71 @@ constinit std::unique_ptr&lt; tests_map &gt;&#160;</td><td class="memItemRight" 
 
 <p>Run all tests that match a filter. </p>
 <dl class="section user"><dt>filters</dt><dd>test filters. Only tests that match at least one filter will be performed. If no filters are specified, all tests will be run</dd></dl>
-<p>The tests are declared by creating objects of <a class="el" href="classdxx_1_1selftest_1_1unit__test.html">unit_test</a>, you would usually want to declare them as <code>static const ...</code> objects in a translation unit: </p><div class="fragment"><div class="line"><span class="comment">// in file test_example.cc</span></div>
-<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_class" href="classdxx_1_1selftest_1_1unit__test.html">dxx::selftest::unit_test</a> <a class="code hl_function" href="#ad01f2ed983e1e20a193bf83c020e75a7">test</a>{</div>
+<p>The tests are declared by creating objects of unit_test, you would usually want to declare them as <code>static const ...</code> objects in a translation unit: </p><div class="fragment"><div class="line"><span class="comment">// in file test_example.cc</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> dxx::selftest::unit_test <a class="code hl_function" href="#ad01f2ed983e1e20a193bf83c020e75a7">test</a>{</div>
 <div class="line">    <span class="stringliteral">&quot;/path/to/test&quot;</span>, [] {</div>
 <div class="line">        <a class="code hl_function" href="#ad01f2ed983e1e20a193bf83c020e75a7">dxx::selftest::test</a>(important_condition);</div>
 <div class="line">    }</div>
 <div class="line">};</div>
-<div class="ttc" id="aclassdxx_1_1selftest_1_1unit__test_html"><div class="ttname"><a href="classdxx_1_1selftest_1_1unit__test.html">dxx::selftest::unit_test</a></div><div class="ttdoc">Create an object of that class to declare a unit test.</div><div class="ttdef"><b>Definition</b> selftest.xx:29</div></div>
-<div class="ttc" id="anamespacedxx_1_1selftest_html_ad01f2ed983e1e20a193bf83c020e75a7"><div class="ttname"><a href="#ad01f2ed983e1e20a193bf83c020e75a7">dxx::selftest::test</a></div><div class="ttdeci">void test(bool condition, std::source_location st=std::source_location::current())</div><div class="ttdoc">Test assertion. Calls dxx::assert::always with test_failure.</div><div class="ttdef"><b>Definition</b> selftest.xx:64</div></div>
+<div class="ttc" id="anamespacedxx_1_1selftest_html_ad01f2ed983e1e20a193bf83c020e75a7"><div class="ttname"><a href="#ad01f2ed983e1e20a193bf83c020e75a7">dxx::selftest::test</a></div><div class="ttdeci">void test(bool condition, std::source_location st=std::source_location::current())</div><div class="ttdoc">Test assertion. Calls dxx::assert::always with test_failure.</div><div class="ttdef"><b>Definition</b> selftest.xx:127</div></div>
 </div><!-- fragment --><p>The test is <b>successful</b> if it does not produce exceptions. The test is <b>failed</b> if it produced an exception of type <a class="el" href="structdxx_1_1selftest_1_1test__failure.html">test_failure</a> (or derived). If the test produces any other exception type, it is not caught by this function and will lead to program termination if not caught by code surrounding <a class="el" href="#abaa7ed75cd9aad2dad39d4319b63ff5d">run_all</a>.</p>
 <p>Test names could be any strings, but the filtering mechanism expects them to follow the UNIX-like filename format: starting with "/" and using it to further create the test "tree". Each filter in <code>filters</code> is tested as follows:</p><ul>
 <li>if the filter starts with "/", the "abolute path" to the test is matched: this means that the test name must start with the filter value</li>
 <li>if the filter does not start with "/" any test that contains the filter as a substring in its name matches that filter </li>
 </ul>
 
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a5c4cc9ba4f4359828c5f4299dc9c2fbe" name="a5c4cc9ba4f4359828c5f4299dc9c2fbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c4cc9ba4f4359828c5f4299dc9c2fbe">&#9670;&#160;</a></span>all_tests</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt;TestsMap&gt; dxx::selftest::all_tests = nullptr</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel constinit">constinit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Storage for all unit tests. </p>
+<p><code>constinit</code> to ensure the smart pointer is initialized before the tests are </p>
+
+</div>
+</div>
+<a id="add5504438945b7503e9414d87f514a17" name="add5504438945b7503e9414d87f514a17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add5504438945b7503e9414d87f514a17">&#9670;&#160;</a></span>anonymous_indicators</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::array dxx::selftest::anonymous_indicators</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel constexpr">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">{</div>
+<div class="line">    <span class="stringliteral">&quot;{anonymous}::&quot;</span>sv,</div>
+<div class="line">    <span class="stringliteral">&quot;(anonymous namespace)::&quot;</span>sv,</div>
+<div class="line">}</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

@@ -115,7 +115,9 @@ $(function(){initNavTree('selftest_8xx.html',''); initResizable(true); });
 
 <p>Main interface file for <a class="el" href="namespacedxx_1_1selftest.html">dxx::selftest</a> module.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>import <a class="el" href="compat_8xx.html">dxx.cstd.compat</a>;</code><br />
+<div class="textblock"><code>import <a class="el" href="fixed_8xx.html">dxx.cstd.fixed</a>;</code><br />
+<code>import <a class="el" href="compat_8xx.html">dxx.cstd.compat</a>;</code><br />
+<code>import <a class="el" href="selftest_8xx.html">dxx.selftest:name_deduce</a>;</code><br />
 <code>import <a class="el" href="assert_8xx.html">dxx.assert</a>;</code><br />
 <code>import std;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -123,25 +125,31 @@ Include dependency graph for selftest.xx:</div>
 <div class="dyncontent">
 <div class="center"><img src="selftest_8xx__incl.png" border="0" usemap="#a_2media_2ssd_2projects_2cpp_2dxx_2selftest_2src_2selftest_8xx" alt=""/></div>
 <map name="a_2media_2ssd_2projects_2cpp_2dxx_2selftest_2src_2selftest_8xx" id="a_2media_2ssd_2projects_2cpp_2dxx_2selftest_2src_2selftest_8xx">
-<area shape="rect" title="Main interface file for dxx::selftest module." alt="" coords="90,5,231,64"/>
-<area shape="rect" href="compat_8xx.html" title="Interface file for cxx.cstd.compat module." alt="" coords="5,112,124,139"/>
-<area shape="poly" title=" " alt="" coords="131,66,91,103,88,99,128,62"/>
-<area shape="rect" title=" " alt="" coords="141,261,180,288"/>
-<area shape="poly" title=" " alt="" coords="163,65,163,246,158,246,158,65"/>
-<area shape="rect" href="assert_8xx.html" title="Main and only file of the dxx.assert module." alt="" coords="198,187,280,213"/>
-<area shape="poly" title=" " alt="" coords="177,63,229,172,224,174,172,65"/>
-<area shape="rect" href="cstd_8xx.html" title="Main interface file for dxx.cstd module." alt="" coords="27,187,99,213"/>
-<area shape="poly" title=" " alt="" coords="67,139,66,171,61,171,62,139"/>
-<area shape="poly" title=" " alt="" coords="100,183,117,187,125,200,123,209,116,214,113,209,118,205,120,200,114,191,99,189"/>
-<area shape="poly" title=" " alt="" coords="82,212,133,250,130,254,79,216"/>
-<area shape="poly" title=" " alt="" coords="227,216,187,253,183,249,224,212"/>
+<area shape="rect" title="Main interface file for dxx::selftest module." alt="" coords="132,5,272,64"/>
+<area shape="poly" title=" " alt="" coords="274,16,291,22,299,34,296,43,289,49,286,45,292,40,294,35,288,26,272,21"/>
+<area shape="rect" href="fixed_8xx.html" title="Interface file for dxx.cstd.fixed module." alt="" coords="13,112,116,139"/>
+<area shape="poly" title=" " alt="" coords="159,67,99,106,96,101,156,62"/>
+<area shape="rect" title=" " alt="" coords="170,261,210,288"/>
+<area shape="poly" title=" " alt="" coords="194,65,182,112,178,163,182,213,187,246,182,247,177,214,173,163,177,112,189,64"/>
+<area shape="rect" href="compat_8xx.html" title="Interface file for cxx.cstd.compat module." alt="" coords="191,112,309,139"/>
+<area shape="poly" title=" " alt="" coords="220,63,238,97,234,100,215,66"/>
+<area shape="rect" href="assert_8xx.html" title="Main and only file of the dxx.assert module." alt="" coords="312,187,394,213"/>
+<area shape="poly" title=" " alt="" coords="264,62,295,83,323,110,340,140,350,170,345,172,335,142,319,114,292,88,261,67"/>
+<area shape="rect" title=" " alt="" coords="5,187,66,213"/>
+<area shape="poly" title=" " alt="" coords="62,140,49,173,44,171,57,138"/>
+<area shape="poly" title=" " alt="" coords="77,137,138,212,170,248,166,252,133,215,73,141"/>
+<area shape="rect" href="cstd_8xx.html" title="Main interface file for dxx.cstd module." alt="" coords="192,187,263,213"/>
+<area shape="poly" title=" " alt="" coords="249,140,239,173,233,171,244,138"/>
+<area shape="poly" title=" " alt="" coords="223,215,206,249,201,246,219,213"/>
+<area shape="poly" title=" " alt="" coords="264,183,282,187,290,200,287,209,280,214,277,209,283,205,285,200,279,191,263,189"/>
+<area shape="poly" title=" " alt="" coords="326,216,225,261,223,256,323,211"/>
 </map>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdxx_1_1selftest_1_1unit__test.html">dxx::selftest::unit_test</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an object of that class to declare a unit test.  <a href="classdxx_1_1selftest_1_1unit__test.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classdxx_1_1selftest_1_1UnitTest.html">dxx::selftest::UnitTest&lt; TFunc &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create an object of that class to declare a unit test.  <a href="classdxx_1_1selftest_1_1UnitTest.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structdxx_1_1selftest_1_1test__failure.html">dxx::selftest::test_failure</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The exception type used by test assertions.  <a href="structdxx_1_1selftest_1_1test__failure.html#details">More...</a><br /></td></tr>
@@ -155,12 +163,12 @@ Namespaces</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a138c9d0c45d79a5c2c05acc812e2824a" id="r_a138c9d0c45d79a5c2c05acc812e2824a"><td class="memItemLeft" align="right" valign="top"><a id="a138c9d0c45d79a5c2c05acc812e2824a" name="a138c9d0c45d79a5c2c05acc812e2824a"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::body_f</b> = std::function&lt;void()&gt;</td></tr>
-<tr class="separator:a138c9d0c45d79a5c2c05acc812e2824a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e18ee8a4036007bd0dfd79440f5b0b7" id="r_a1e18ee8a4036007bd0dfd79440f5b0b7"><td class="memItemLeft" align="right" valign="top"><a id="a1e18ee8a4036007bd0dfd79440f5b0b7" name="a1e18ee8a4036007bd0dfd79440f5b0b7"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::tests_map</b> = std::map&lt;std::string, body_f&gt;</td></tr>
-<tr class="separator:a1e18ee8a4036007bd0dfd79440f5b0b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b93cde2f193d7bfc789ad8b9ed05b42" id="r_a8b93cde2f193d7bfc789ad8b9ed05b42"><td class="memItemLeft" align="right" valign="top"><a id="a8b93cde2f193d7bfc789ad8b9ed05b42" name="a8b93cde2f193d7bfc789ad8b9ed05b42"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::TestBody</b> = std::function&lt;void()&gt;</td></tr>
+<tr class="separator:a8b93cde2f193d7bfc789ad8b9ed05b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85b79054cb05dd15899852075575b3c4" id="r_a85b79054cb05dd15899852075575b3c4"><td class="memItemLeft" align="right" valign="top"><a id="a85b79054cb05dd15899852075575b3c4" name="a85b79054cb05dd15899852075575b3c4"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::TestsMap</b> = std::map&lt;std::string, TestBody&gt;</td></tr>
+<tr class="separator:a85b79054cb05dd15899852075575b3c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -174,9 +182,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::test</
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a36039504bcddc37dedd8db6dda3950b4" id="r_a36039504bcddc37dedd8db6dda3950b4"><td class="memItemLeft" align="right" valign="top"><a id="a36039504bcddc37dedd8db6dda3950b4" name="a36039504bcddc37dedd8db6dda3950b4"></a>
-constinit std::unique_ptr&lt; tests_map &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>dxx::selftest::all_tests</b> = nullptr</td></tr>
-<tr class="separator:a36039504bcddc37dedd8db6dda3950b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c4cc9ba4f4359828c5f4299dc9c2fbe" id="r_a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="memItemLeft" align="right" valign="top">constinit std::unique_ptr&lt; TestsMap &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedxx_1_1selftest.html#a5c4cc9ba4f4359828c5f4299dc9c2fbe">dxx::selftest::all_tests</a> = nullptr</td></tr>
+<tr class="memdesc:a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Storage for all unit tests.  <br /></td></tr>
+<tr class="separator:a5c4cc9ba4f4359828c5f4299dc9c2fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Main interface file for <a class="el" href="namespacedxx_1_1selftest.html">dxx::selftest</a> module. </p>

@@ -15,7 +15,20 @@ var annotated_dup =
       ] ],
       [ "selftest", "namespacedxx_1_1selftest.html", [
         [ "test_failure", "structdxx_1_1selftest_1_1test__failure.html", null ],
-        [ "unit_test", "classdxx_1_1selftest_1_1unit__test.html", "classdxx_1_1selftest_1_1unit__test" ]
+        [ "UnitTest", "classdxx_1_1selftest_1_1UnitTest.html", "classdxx_1_1selftest_1_1UnitTest" ]
       ] ]
-    ] ]
+    ] ],
+    [ "FOf", "structFOf.html", null ],
+    [ "FOf< 32 >", "structFOf_3_0132_01_4.html", null ],
+    [ "FOf< 64 >", "structFOf_3_0164_01_4.html", null ],
+    [ "IOf", "structIOf.html", null ],
+    [ "IOf< 16 >", "structIOf_3_0116_01_4.html", null ],
+    [ "IOf< 32 >", "structIOf_3_0132_01_4.html", null ],
+    [ "IOf< 64 >", "structIOf_3_0164_01_4.html", null ],
+    [ "IOf< 8 >", "structIOf_3_018_01_4.html", null ],
+    [ "UOf", "structUOf.html", null ],
+    [ "UOf< 16 >", "structUOf_3_0116_01_4.html", null ],
+    [ "UOf< 32 >", "structUOf_3_0132_01_4.html", null ],
+    [ "UOf< 64 >", "structUOf_3_0164_01_4.html", null ],
+    [ "UOf< 8 >", "structUOf_3_018_01_4.html", null ]
 ];

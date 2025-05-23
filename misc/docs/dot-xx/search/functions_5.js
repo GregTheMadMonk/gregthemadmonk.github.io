@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['unit_5ftest_0',['unit_test',['../classdxx_1_1selftest_1_1unit__test.html#a6e06352b15c63827d048d067f6d8fe2b',1,'dxx::selftest::unit_test']]]
+  ['run_5fall_0',['run_all',['../namespacedxx_1_1selftest.html#abaa7ed75cd9aad2dad39d4319b63ff5d',1,'dxx::selftest']]]
 ];
